@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f0e5">
+  <title>Adeus 3c — uma lembrança para guardar</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f5f0e5;
+      --ink: #253d32;
+      --muted: #647064;
+      --orange: #c76e4d;
+      --line: rgba(37, 61, 50, .18);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    a { color: inherit; }
+
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: 100svh;
+      place-items: center;
+      overflow: hidden;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgba(199, 110, 77, .12), transparent 30%),
+        radial-gradient(ellipse at 85% 78%, rgba(84, 111, 85, .14), transparent 32%),
+        var(--paper);
+    }
+
+    .hero::before, .hero::after {
+      position: absolute;
+      width: 14rem;
+      height: 14rem;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      content: "";
+      pointer-events: none;
+    }
+
+    .hero::before { top: -8rem; left: -5rem; }
+    .hero::after { right: -7rem; bottom: -8rem; width: 22rem; height: 22rem; }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .eyebrow {
+      margin: 0 0 1.2rem;
+      color: var(--orange);
+      font: 600 .72rem/1.4 Arial, sans-serif;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(4.5rem, 17vw, 11rem);
+      font-weight: 400;
+      letter-spacing: -.085em;
+      line-height: .82;
+    }
+
+    h1 span {
+      display: block;
+      margin-top: .2em;
+      color: var(--orange);
+      font-style: italic;
+    }
+
+    .hero-note {
+      max-width: 24rem;
+      margin: 2rem auto 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.4vw, 1.25rem);
+      line-height: 1.7;
+    }
+
+    .scroll-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      margin-top: 3rem;
+      color: var(--ink);
+      font: 600 .7rem Arial, sans-serif;
+      letter-spacing: .16em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .scroll-link span {
+      display: grid;
+      width: 2.3rem;
+      height: 2.3rem;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      font-size: 1rem;
+      place-items: center;
+    }
+
+    .memories {
+      padding: 7rem max(1.25rem, calc((100vw - 1200px) / 2)) 8rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-heading {
+      max-width: 38rem;
+      margin: 0 auto 4rem;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 400;
+      letter-spacing: -.05em;
+    }
+
+    .section-heading p:last-child {
+      margin: 1rem auto 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .photo-count {
+      display: inline-block;
+      margin-top: 1.4rem;
+      color: var(--orange);
+      font: 600 .68rem Arial, sans-serif;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: start;
+      gap: clamp(1.2rem, 3vw, 2.8rem);
+    }
+
+    .polaroid {
+      margin: 0;
+      padding: .65rem .65rem .9rem;
+      background: #fffdf8;
+      box-shadow: 0 8px 24px rgba(37, 42, 34, .12), 0 1px 3px rgba(37, 42, 34, .12);
+      opacity: 0;
+      transform: translateY(18px) rotate(var(--tilt, 0deg));
+      transition: opacity .55s ease, transform .55s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .polaroid.is-visible {
+      opacity: 1;
+      transform: translateY(0) rotate(var(--tilt, 0deg));
+    }
+
+    .polaroid img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #e8e2d5;
+      object-fit: cover;
+    }
+
+    .polaroid--contain img {
+      object-fit: contain;
+    }
+
+    .polaroid figcaption {
+      padding-top: .75rem;
+      color: #777669;
+      font: italic .82rem/1.3 Georgia, serif;
+      text-align: center;
+    }
+
+    .invitation {
+      display: grid;
+      min-height: 90svh;
+      grid-template-columns: 1fr minmax(16rem, .85fr);
+      align-items: center;
+      gap: clamp(2.5rem, 8vw, 7rem);
+      padding: 7rem max(1.5rem, calc((100vw - 1080px) / 2));
+      background: #e8e5d8;
+    }
+
+    .invite-copy { max-width: 38rem; }
+
+    .invite-copy h2 {
+      margin: 0;
+      font-size: clamp(2.7rem, 6.3vw, 5.3rem);
+      font-weight: 400;
+      letter-spacing: -.065em;
+      line-height: 1.03;
+    }
+
+    .invite-copy h2 span {
+      color: var(--orange);
+      font-style: italic;
+    }
+
+    .invite-note {
+      margin: 1.5rem 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.75;
+    }
+
+    .answer-button {
+      margin-top: 2rem;
+      padding: .95rem 1.35rem;
+      border: 0;
+      border-radius: 2px;
+      background: var(--ink);
+      color: white;
+      cursor: pointer;
+      font: 600 .75rem Arial, sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .answer-button:hover { background: var(--orange); transform: translateY(-2px); }
+    .answer-button:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+
+    .answer-message {
+      min-height: 1.5rem;
+      margin: 1rem 0 0;
+      color: var(--orange);
+      font-style: italic;
+    }
+
+    .special-frame {
+      position: relative;
+      width: min(100%, 22rem);
+      justify-self: center;
+      padding: .8rem .8rem 1.1rem;
+      background: #fffdf8;
+      box-shadow: 0 18px 45px rgba(37, 42, 34, .18);
+      transform: rotate(2deg);
+    }
+
+    .special-frame::before {
+      position: absolute;
+      top: -.8rem;
+      left: 50%;
+      width: 5rem;
+      height: 1.5rem;
+      background: rgba(199, 110, 77, .35);
+      content: "";
+      transform: translateX(-50%) rotate(-4deg);
+    }
+
+    .special-frame img {
+      display: block;
+      width: 100%;
+      max-height: 31rem;
+      aspect-ratio: 3 / 4;
+      background: #e8e2d5;
+      object-fit: cover;
+    }
+
+    .special-frame figcaption {
+      padding-top: .85rem;
+      color: #777669;
+      font: italic .9rem Georgia, serif;
+      text-align: center;
+    }
+
+    footer {
+      padding: 1.5rem;
+      color: var(--muted);
+      font: .7rem Arial, sans-serif;
+      letter-spacing: .12em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .music-player {
+      position: fixed;
+      z-index: 5;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      max-width: calc(100vw - 2rem);
+      padding: .45rem .9rem .45rem .5rem;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 999px;
+      background: rgba(37, 61, 50, .96);
+      box-shadow: 0 8px 24px rgba(37, 42, 34, .2);
+      color: #fffdf8;
+    }
+
+    .music-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font: 600 .68rem Arial, sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .music-toggle[hidden] { display: none; }
+    .music-toggle:focus-visible { outline: 2px solid #fffdf8; outline-offset: 4px; }
+
+    .music-icon {
+      display: grid;
+      width: 2.2rem;
+      height: 2.2rem;
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      color: #e6a184;
+      font-size: 1.1rem;
+      place-items: center;
+    }
+
+    .music-status {
+      max-width: 10rem;
+      margin: 0;
+      color: rgba(255, 253, 248, .72);
+      font: .68rem/1.35 Arial, sans-serif;
+    }
+
+    @media (max-width: 900px) {
+      .gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .invitation { grid-template-columns: 1fr .8fr; gap: 2.5rem; }
+    }
+
+    @media (max-width: 600px) {
+      .hero { min-height: 88svh; }
+      .memories { padding: 5rem 1.1rem 6rem; }
+      .section-heading { margin-bottom: 2.5rem; }
+      .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem .9rem; }
+      .polaroid { padding: .45rem .45rem .7rem; }
+      .polaroid figcaption { padding-top: .55rem; font-size: .72rem; }
+      .invitation { min-height: auto; grid-template-columns: 1fr; padding: 5rem 1.5rem; }
+      .invite-copy { text-align: center; }
+      .special-frame { width: min(75%, 18rem); }
+      .music-player { right: .75rem; bottom: .75rem; gap: .55rem; padding-right: .7rem; }
+      .music-status { max-width: 7rem; font-size: .62rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+      .polaroid { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Uma história que fica com a gente</p>
+        <h1>Adeus <span>3c</span></h1>
+        <p class="hero-note">Cada foto guarda um pedacinho de tudo o que vivemos juntos. Desça devagar — tem muita lembrança bonita por aqui.</p>
+        <a class="scroll-link" href="#memorias">Ver nossas lembranças <span aria-hidden="true">↓</span></a>
+      </div>
+    </header>
+
+    <section class="memories" id="memorias" aria-labelledby="memories-title">
+      <div class="section-heading">
+        <p class="eyebrow">Pedaços da nossa história</p>
+        <h2 id="memories-title">O 3c em momentos</h2>
+        <p>Risadas, encontros e dias que vão morar para sempre na memória. Uma polaroid de cada vez.</p>
+        <span class="photo-count" id="photo-count"></span>
+      </div>
+      <div class="gallery" id="gallery" aria-label="Álbum de fotos da turma 3c"></div>
+    </section>
+
+    <section class="invitation" aria-labelledby="invitation-title">
+      <div class="invite-copy">
+        <p class="eyebrow">Uma pergunta especial</p>
+        <h2 id="invitation-title">Mario, você aceita ser nosso <span>paraninfo?</span></h2>
+        <p class="invite-note">Professor, você fez parte da nossa caminhada e queremos muito ter você ao nosso lado nesse momento tão especial.</p>
+        <button class="answer-button" id="answer-button" type="button">Aceito ser paraninfo!</button>
+        <p class="answer-message" id="answer-message" aria-live="polite"></p>
+      </div>
+      <figure class="special-frame">
+        <img src="especial/WhatsApp%20Image%202026-11-26%20at%2015.54.46.jpeg" alt="Mario e um aluno da turma em um abraço">
+        <figcaption>Com carinho, turma 3c</figcaption>
+      </figure>
+    </section>
+  </main>
+  <footer>Com carinho, turma 3c · 2026</footer>
+  <aside class="music-player" aria-label="Música de fundo">
+    <button class="music-toggle" id="music-start" type="button">
+      <span class="music-icon" aria-hidden="true">♫</span>
+      <span>Iniciar música</span>
+    </button>
+    <p class="music-status" id="music-status" aria-live="polite">Tentando iniciar a trilha automaticamente</p>
+  </aside>
+  <audio id="background-music" autoplay preload="metadata" loop
+    src="Legi%C3%A3o%20Urbana%20%C2%B7%20Tempo%20perdido(MP3_160K).mp3"
+    aria-label="Tempo Perdido, de Legião Urbana"></audio>
+
+  <script src="fotos.js"></script>
+  <script>
+    const gallery = document.getElementById("gallery");
+    const photoCount = document.getElementById("photo-count");
+    const photos = window.memories;
+
+    if (!Array.isArray(photos) || photos.length === 0) {
+      throw new Error("Não foi possível carregar a lista de fotos da turma.");
+    }
+
+    photoCount.textContent = photos.length + (photos.length === 1 ? " lembrança" : " lembranças");
+
+    const observer = "IntersectionObserver" in window
+      ? new IntersectionObserver((entries, currentObserver) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              currentObserver.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: "80px 0px" })
+      : null;
+
+    photos.forEach((photo, index) => {
+      const card = document.createElement("figure");
+      card.className = "polaroid";
+      if (photo.fit === "contain") card.classList.add("polaroid--contain");
+      card.style.setProperty("--tilt", ((index % 5) - 2) * 1.15 + "deg");
+
+      const image = document.createElement("img");
+      image.src = photo.src;
+      image.alt = "Lembrança " + (index + 1) + " da turma 3c";
+      image.loading = "lazy";
+      image.decoding = "async";
+
+      const caption = document.createElement("figcaption");
+      caption.textContent = "lembrança " + String(index + 1).padStart(2, "0");
+
+      card.append(image, caption);
+      gallery.append(card);
+      if (observer) observer.observe(card);
+      else card.classList.add("is-visible");
+    });
+
+    const backgroundMusic = document.getElementById("background-music");
+    const musicStart = document.getElementById("music-start");
+    const musicStatus = document.getElementById("music-status");
+
+    async function startBackgroundMusic() {
+      try {
+        await backgroundMusic.play();
+      } catch (error) {
+        if (error.name === "NotAllowedError") {
+          musicStatus.textContent = "O navegador bloqueou o início automático. Toque para começar.";
+          return;
+        }
+        musicStatus.textContent = "Não foi possível iniciar a música.";
+        console.error("Falha ao iniciar a música de fundo.", error);
+      }
+    }
+
+    musicStart.addEventListener("click", startBackgroundMusic);
+
+    backgroundMusic.addEventListener("play", () => {
+      musicStatus.textContent = "Tocando ao fundo";
+      musicStart.hidden = true;
+    });
+
+    backgroundMusic.addEventListener("error", () => {
+      musicStatus.textContent = "Não foi possível carregar a música.";
+      console.error("Falha ao carregar o arquivo de música de fundo.", backgroundMusic.error);
+    });
+
+    startBackgroundMusic();
+
+    document.getElementById("answer-button").addEventListener("click", (event) => {
+      document.getElementById("answer-message").textContent =
+        "Sabíamos! Obrigado por fazer parte da nossa história, Mario. 💚";
+      event.currentTarget.textContent = "Que alegria!";
+      event.currentTarget.disabled = true;
+    });
+  </script>
+</body>
+</html>
